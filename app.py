@@ -43,8 +43,18 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
+    return render_template('home.html')
+
+
+@app.route('/store')
+def store():
     items = InventoryItem.query.all()
     return render_template('index.html', items=items)
+
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
