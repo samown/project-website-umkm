@@ -1,3 +1,28 @@
-note.md
-venv/
+# Environment variables (JANGAN pernah di-commit!)
+.env
+
+# Python
 __pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+
+# Flask
+instance/
+*.log
+
+# Upload gambar (opsional — tergantung kebijakan kelompok)
+# app/static/images/*.jpg
+# app/static/images/*.png
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

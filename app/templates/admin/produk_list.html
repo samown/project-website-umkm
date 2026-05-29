@@ -1,0 +1,95 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Daftar Produk{% endblock %}
+{% block page_title %}Manajemen Produk{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <p class="text-sm text-gray-500">{{ products|length }} produk terdaftar</p>
+  <a href="{{ url_for('admin.produk_tambah') }}"
+     class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm">
+    + Tambah Produk
+  </a>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+        <tr>
+          <th class="text-left px-4 py-3">Gambar</th>
+          <th class="text-left px-4 py-3">Produk</th>
+          <th class="text-left px-4 py-3">Kategori</th>
+          <th class="text-left px-4 py-3">Harga</th>
+          <th class="text-left px-4 py-3">Stok</th>
+          <th class="text-left px-4 py-3">Status</th>
+          <th class="text-left px-4 py-3">Aksi</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        {% for p in products %}
+        <tr class="hover:bg-orange-50/30 transition">
+          <td class="px-4 py-3">
+            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center overflow-hidden flex-shrink-0">
+              {% if p.image %}
+                <img src="{{ url_for('static', filename='images/' + p.image) }}"
+                     class="w-full h-full object-cover" alt="{{ p.name }}"/>
+              {% else %}
+                <span class="text-2xl">🛍️</span>
+              {% endif %}
+            </div>
+          </td>
+          <td class="px-4 py-3">
+            <p class="font-semibold text-gray-800 max-w-xs truncate">{{ p.name }}</p>
+          </td>
+          <td class="px-4 py-3">
+            <span class="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-medium">
+              {{ p.category_name }}
+            </span>
+          </td>
+          <td class="px-4 py-3 font-semibold text-gray-800">
+            Rp{{ "{:,.0f}".format(p.price) }}
+          </td>
+          <td class="px-4 py-3">
+            <span class="{% if p.stock <= 5 %}text-red-600 font-semibold{% else %}text-gray-700{% endif %}">
+              {{ p.stock }}
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            {% if p.is_active %}
+              <span class="bg-green-100 text-green-700 text-xs px-2.5 py-1 rounded-full font-semibold">Aktif</span>
+            {% else %}
+              <span class="bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-full font-semibold">Nonaktif</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-2">
+              <a href="{{ url_for('admin.produk_edit', produk_id=p.id) }}"
+                 class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-lg font-medium transition">
+                Edit
+              </a>
+              <!-- Hapus dengan konfirmasi Alpine.js -->
+              <form method="POST"
+                    action="{{ url_for('admin.produk_hapus', produk_id=p.id) }}"
+                    x-data
+                    @submit.prevent="if(confirm('Hapus produk ini?')) $el.submit()">
+                <button type="submit"
+                        class="text-xs bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-lg font-medium transition">
+                  Hapus
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="px-6 py-12 text-center text-gray-400">
+            Belum ada produk.
+            <a href="{{ url_for('admin.produk_tambah') }}" class="text-orange-500 hover:underline">Tambah sekarang</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Detail Pesanan #{{ order.id }}{% endblock %}
+{% block page_title %}Detail Pesanan #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="grid md:grid-cols-3 gap-6">
+  <!-- ─ Info Pelanggan ─ -->
+  <div class="md:col-span-2 space-y-5">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h3 class="font-semibold text-gray-800 mb-4">Informasi Pelanggan</h3>
+      <dl class="space-y-2 text-sm">
+        <div class="flex gap-4">
+          <dt class="w-32 text-gray-500 flex-shrink-0">Nama</dt>
+          <dd class="font-medium text-gray-800">{{ order.customer_name }}</dd>
+        </div>
+        <div class="flex gap-4">
+          <dt class="w-32 text-gray-500 flex-shrink-0">Telepon</dt>
+          <dd>
+            <a href="https://wa.me/{{ order.customer_phone }}" target="_blank"
+               class="text-green-600 hover:underline font-medium">
+              📲 {{ order.customer_phone }}
+            </a>
+          </dd>
+        </div>
+        <div class="flex gap-4">
+          <dt class="w-32 text-gray-500 flex-shrink-0">Alamat</dt>
+          <dd class="text-gray-700">{{ order.customer_address }}</dd>
+        </div>
+        {% if order.notes %}
+        <div class="flex gap-4">
+          <dt class="w-32 text-gray-500 flex-shrink-0">Catatan</dt>
+          <dd class="text-gray-700 italic">{{ order.notes }}</dd>
+        </div>
+        {% endif %}
+        <div class="flex gap-4">
+          <dt class="w-32 text-gray-500 flex-shrink-0">Tanggal</dt>
+          <dd class="text-gray-700">{{ order.created_at.strftime('%d %B %Y, %H:%M') }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Item Pesanan (JOIN order_items + products) -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <h3 class="font-semibold text-gray-800 px-6 py-4 border-b">Item Pesanan</h3>
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+          <tr>
+            <th class="text-left px-6 py-3">Produk</th>
+            <th class="text-right px-6 py-3">Harga</th>
+            <th class="text-right px-6 py-3">Qty</th>
+            <th class="text-right px-6 py-3">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for item in items %}
+          <tr>
+            <td class="px-6 py-3 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                {% if item.image %}
+                  <img src="{{ url_for('static', filename='images/' + item.image) }}"
+                       class="w-full h-full object-cover"/>
+                {% else %}
+                  <span>🛍️</span>
+                {% endif %}
+              </div>
+              <span class="font-medium text-gray-800">{{ item.product_name }}</span>
+            </td>
+            <td class="px-6 py-3 text-right text-gray-600">Rp{{ "{:,.0f}".format(item.price) }}</td>
+            <td class="px-6 py-3 text-right text-gray-600">{{ item.quantity }}</td>
+            <td class="px-6 py-3 text-right font-semibold text-gray-800">Rp{{ "{:,.0f}".format(item.subtotal) }}</td>
+          </tr>
+          {% endfor %}
+          <tr class="bg-orange-50">
+            <td colspan="3" class="px-6 py-3 text-right font-semibold text-gray-800">Total</td>
+            <td class="px-6 py-3 text-right font-bold text-orange-600 text-base">
+              Rp{{ "{:,.0f}".format(order.total_price) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─ Panel Status ─ -->
+  <div class="space-y-4">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+      <h3 class="font-semibold text-gray-800 mb-4">Status Pesanan</h3>
+      {% set badge = {
+        'pending':'bg-yellow-100 text-yellow-700',
+        'confirmed':'bg-blue-100 text-blue-700',
+        'completed':'bg-green-100 text-green-700',
+        'cancelled':'bg-red-100 text-red-700'
+      } %}
+      <span class="inline-block px-3 py-1.5 rounded-full text-sm font-semibold mb-5 {{ badge.get(order.status,'') }}">
+        {{ order.status }}
+      </span>
+
+      <form method="POST" action="{{ url_for('admin.pesanan_status', order_id=order.id) }}" class="space-y-3">
+        <select name="status" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white">
+          {% for s in ['pending','confirmed','completed','cancelled'] %}
+            <option value="{{ s }}" {% if order.status == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit"
+                class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl text-sm transition">
+          Update Status
+        </button>
+      </form>
+    </div>
+
+    <a href="{{ url_for('admin.pesanan_list') }}"
+       class="block text-center text-sm text-gray-500 hover:text-orange-600 transition">
+      ← Kembali ke daftar pesanan
+    </a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}Katalog Produk{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-10">
+  <h1 class="font-display text-3xl font-bold text-gray-800 mb-2">Katalog Produk</h1>
+  <p class="text-gray-500 mb-8">Temukan kebutuhan rumah tangga Anda di sini</p>
+
+  <!-- ──── Filter & Pencarian ──── -->
+  <form method="GET" action="{{ url_for('public.produk') }}"
+        class="flex flex-col sm:flex-row gap-3 mb-8 bg-white p-4 rounded-2xl shadow-sm border border-orange-100">
+
+    <input name="q" type="text" placeholder="🔍 Cari produk…" value="{{ search }}"
+           class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
+
+    <select name="cat"
+            class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white">
+      <option value="">Semua Kategori</option>
+      {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if active_cat == cat.id|string %}selected{% endif %}>
+          {{ cat.name }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <button type="submit"
+            class="bg-orange-500 text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-orange-600 transition">
+      Cari
+    </button>
+    {% if search or active_cat %}
+    <a href="{{ url_for('public.produk') }}"
+       class="border border-gray-200 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition text-center">
+      Reset
+    </a>
+    {% endif %}
+  </form>
+
+  <!-- ──── Hasil ──── -->
+  {% if search or active_cat %}
+    <p class="text-sm text-gray-500 mb-4">
+      {{ products|length }} produk ditemukan
+      {% if search %}untuk "<strong>{{ search }}</strong>"{% endif %}
+    </p>
+  {% endif %}
+
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" id="product-grid">
+    {% for p in products %}
+    <div class="bg-white rounded-2xl shadow-sm border border-orange-50 overflow-hidden hover:shadow-md transition group">
+      <div class="h-36 bg-amber-50 flex items-center justify-center overflow-hidden">
+        {% if p.image %}
+          <img src="{{ url_for('static', filename='images/' + p.image) }}"
+               alt="{{ p.name }}" class="w-full h-full object-cover group-hover:scale-105 transition"/>
+        {% else %}
+          <span class="text-5xl">🛍️</span>
+        {% endif %}
+      </div>
+      <div class="p-3">
+        <span class="text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">
+          {{ p.category_name }}
+        </span>
+        <h3 class="text-sm font-semibold mt-1 text-gray-800 line-clamp-2">{{ p.name }}</h3>
+        <p class="text-orange-600 font-bold text-sm mt-1">
+          Rp{{ "{:,.0f}".format(p.price) }}
+        </p>
+        {% if p.stock > 0 %}
+          <p class="text-[10px] text-gray-400 mt-0.5">Stok: {{ p.stock }}</p>
+          <button onclick="addToCart({{ p.id }}, '{{ p.name|e }}', {{ p.price }})"
+                  class="mt-2 w-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold py-2 rounded-xl transition">
+            + Keranjang
+          </button>
+        {% else %}
+          <span class="mt-2 block w-full bg-gray-100 text-gray-400 text-xs font-semibold py-2 rounded-xl text-center">
+            Habis
+          </span>
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div class="col-span-4 text-center py-20 text-gray-400">
+      <div class="text-5xl mb-3">🔍</div>
+      <p>Tidak ada produk yang ditemukan.</p>
+      <a href="{{ url_for('public.produk') }}" class="text-orange-500 text-sm mt-2 inline-block hover:underline">
+        Lihat semua produk
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Keranjang (sama seperti index.html) -->
+<div x-data="cart()" x-init="loadCart()">
+  <button @click="open = true"
+          class="fixed bottom-6 right-6 z-50 bg-orange-500 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:bg-orange-600 transition"
+          x-show="items.length > 0">
+    <span class="text-2xl">🛒</span>
+    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold"
+          x-text="totalQty()"></span>
+  </button>
+
+  <div x-show="open" x-transition class="fixed inset-0 z-50 flex justify-end" style="display:none">
+    <div @click="open = false" class="absolute inset-0 bg-black/40"></div>
+    <div class="relative w-full max-w-sm bg-white h-full shadow-2xl flex flex-col">
+      <div class="flex items-center justify-between px-5 py-4 border-b">
+        <h2 class="font-display text-lg font-bold">🛒 Keranjang</h2>
+        <button @click="open = false">✕</button>
+      </div>
+      <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+        <template x-for="item in items" :key="item.id">
+          <div class="flex items-center gap-3 bg-orange-50 p-3 rounded-xl">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold truncate" x-text="item.name"></p>
+              <p class="text-xs text-orange-600 font-medium"
+                 x-text="'Rp' + item.price.toLocaleString('id-ID')"></p>
+            </div>
+            <div class="flex items-center gap-1">
+              <button @click="dec(item.id)" class="w-7 h-7 bg-white border rounded-lg text-sm font-bold">−</button>
+              <span class="w-6 text-center text-sm font-semibold" x-text="item.qty"></span>
+              <button @click="inc(item.id)" class="w-7 h-7 bg-white border rounded-lg text-sm font-bold">+</button>
+            </div>
+          </div>
+        </template>
+        <p x-show="items.length===0" class="text-center text-gray-400 text-sm pt-8">Keranjang kosong</p>
+      </div>
+      <div class="border-t px-5 py-4 space-y-3">
+        <div class="flex justify-between text-sm font-semibold">
+          <span>Total</span>
+          <span class="text-orange-600" x-text="'Rp' + totalPrice().toLocaleString('id-ID')"></span>
+        </div>
+        <button @click="showCheckout=true" x-show="items.length>0"
+                class="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl">
+          Checkout →
+        </button>
+      </div>
+      <!-- Checkout form -->
+      <div x-show="showCheckout" x-transition class="absolute inset-0 bg-white flex flex-col" style="display:none">
+        <div class="flex items-center gap-3 px-5 py-4 border-b">
+          <button @click="showCheckout=false">←</button>
+          <h2 class="font-display text-lg font-bold">Detail Pesanan</h2>
+        </div>
+        <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+          <input x-model="form.name"    placeholder="Nama lengkap *"    class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
+          <input x-model="form.phone"   placeholder="No. HP / WA *"     class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
+          <textarea x-model="form.address" placeholder="Alamat *" rows="3" class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"></textarea>
+          <textarea x-model="form.notes"   placeholder="Catatan"  rows="2" class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"></textarea>
+          <p x-show="checkoutError" x-text="checkoutError" class="text-red-600 text-xs bg-red-50 px-3 py-2 rounded-lg"></p>
+        </div>
+        <div class="border-t px-5 py-4">
+          <button @click="doCheckout()" :disabled="loading"
+                  class="w-full bg-green-500 text-white font-semibold py-3 rounded-xl disabled:opacity-60">
+            <span x-show="!loading">📲 Pesan via WhatsApp</span>
+            <span x-show="loading">Memproses…</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function addToCart(id, name, price) {
+  window.dispatchEvent(new CustomEvent('add-to-cart', { detail: { id, name, price } }));
+  window.dispatchEvent(new CustomEvent('open-cart'));
+}
+function cart() {
+  return {
+    open:false, showCheckout:false, items:[], loading:false,
+    checkoutError:'', form:{name:'',phone:'',address:'',notes:''},
+    loadCart() {
+      window.addEventListener('add-to-cart', (e) => this.add(e.detail));
+      window.addEventListener('open-cart',   ()  => { this.open = true; });
+    },
+    add({id,name,price}) {
+      const ex = this.items.find(i=>i.id===id);
+      ex ? ex.qty++ : this.items.push({id,name,price,qty:1});
+    },
+    inc(id) { const i=this.items.find(i=>i.id===id); if(i) i.qty++; },
+    dec(id) {
+      const i=this.items.find(i=>i.id===id);
+      if(!i) return;
+      i.qty>1 ? i.qty-- : this.items=this.items.filter(x=>x.id!==id);
+    },
+    totalQty()  { return this.items.reduce((s,i)=>s+i.qty,0); },
+    totalPrice(){ return this.items.reduce((s,i)=>s+i.price*i.qty,0); },
+    async doCheckout() {
+      this.checkoutError='';
+      if(!this.form.name||!this.form.phone||!this.form.address){
+        this.checkoutError='Nama, nomor HP, dan alamat wajib diisi.'; return;
+      }
+      this.loading=true;
+      try {
+        const res = await fetch('/checkout',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({...this.form, items:this.items.map(i=>({id:i.id,qty:i.qty}))})
+        });
+        const data = await res.json();
+        if(data.redirect){ this.items=[]; this.open=false; this.showCheckout=false; window.open(data.redirect,'_blank'); }
+        else { this.checkoutError=data.error||'Terjadi kesalahan.'; }
+      } catch(e) { this.checkoutError='Gagal terhubung ke server.'; }
+      finally { this.loading=false; }
+    }
+  };
+}
+</script>
+{% endblock %}

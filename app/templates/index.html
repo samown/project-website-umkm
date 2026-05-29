@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+{% block title %}Beranda{% endblock %}
+
+{% block content %}
+<!-- ═══════════════ HERO BANNER ═══════════════ -->
+<section class="relative bg-gradient-to-br from-orange-600 via-orange-500 to-amber-400 text-white overflow-hidden">
+  <!-- Dekoratif bulatan -->
+  <div class="absolute -top-16 -right-16 w-64 h-64 bg-white/10 rounded-full"></div>
+  <div class="absolute bottom-0 left-1/3 w-40 h-40 bg-white/10 rounded-full"></div>
+
+  <div class="relative max-w-6xl mx-auto px-4 py-20 flex flex-col md:flex-row items-center gap-10">
+    <div class="flex-1">
+      <span class="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4 tracking-wider uppercase">
+        Sejak 2005 • Surakarta
+      </span>
+      <h1 class="font-display text-4xl md:text-5xl font-bold leading-tight mb-4">
+        Kebutuhan Rumah Tangga<br>Lengkap & Terjangkau
+      </h1>
+      <p class="text-orange-100 text-lg mb-8 max-w-md">
+        Toko Rini menyediakan beras, bumbu dapur, minuman, dan ribuan kebutuhan sehari-hari
+        dengan harga pasar terbaik di Banjarsari, Surakarta.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a href="{{ url_for('public.produk') }}"
+           class="bg-white text-orange-600 font-semibold px-6 py-3 rounded-full hover:bg-orange-50 transition shadow">
+          Lihat Katalog
+        </a>
+        <a href="https://wa.me/6281234567890" target="_blank"
+           class="flex items-center gap-2 bg-green-500 text-white font-semibold px-6 py-3 rounded-full hover:bg-green-600 transition shadow">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.847L0 24l6.335-1.509A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.795 9.795 0 01-5.031-1.388l-.36-.214-3.733.889.934-3.634-.235-.373A9.818 9.818 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/>
+          </svg>
+          Hubungi via WA
+        </a>
+      </div>
+    </div>
+    <div class="flex-shrink-0 text-9xl select-none hidden md:block">🛒</div>
+  </div>
+</section>
+
+<!-- ═══════════════ KEUNGGULAN ═══════════════ -->
+<section class="max-w-6xl mx-auto px-4 py-12">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+    {% for icon, label, desc in [
+        ('🏪','Lengkap','Ribuan produk tersedia'),
+        ('💰','Harga Pas','Kompetitif & transparan'),
+        ('📦','Pesanan WA','Pesan & kirim via WhatsApp'),
+        ('🕖','Buka Tiap Hari','Senin–Minggu, pagi–malam')
+    ] %}
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-orange-100 hover:shadow-md transition">
+      <div class="text-3xl mb-2">{{ icon }}</div>
+      <div class="font-semibold text-gray-800">{{ label }}</div>
+      <div class="text-xs text-gray-500 mt-1">{{ desc }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ═══════════════ PRODUK UNGGULAN ═══════════════ -->
+<section class="max-w-6xl mx-auto px-4 pb-10">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="font-display text-2xl font-bold text-gray-800">Produk Terbaru</h2>
+    <a href="{{ url_for('public.produk') }}"
+       class="text-sm text-orange-600 font-semibold hover:underline">Lihat semua →</a>
+  </div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+    {% for p in featured %}
+    <div class="bg-white rounded-2xl shadow-sm border border-orange-50 overflow-hidden hover:shadow-md transition group">
+      <!-- Gambar produk -->
+      <div class="h-36 bg-amber-50 flex items-center justify-center overflow-hidden">
+        {% if p.image %}
+          <img src="{{ url_for('static', filename='images/' + p.image) }}"
+               alt="{{ p.name }}" class="w-full h-full object-cover group-hover:scale-105 transition"/>
+        {% else %}
+          <span class="text-5xl">🛍️</span>
+        {% endif %}
+      </div>
+      <div class="p-3">
+        <span class="text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">
+          {{ p.category_name }}
+        </span>
+        <h3 class="text-sm font-semibold mt-1 text-gray-800 line-clamp-2">{{ p.name }}</h3>
+        <p class="text-orange-600 font-bold text-sm mt-1">
+          Rp{{ "{:,.0f}".format(p.price) }}
+        </p>
+        <button onclick="addToCart({{ p.id }}, '{{ p.name|e }}', {{ p.price }})"
+                class="mt-2 w-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold py-2 rounded-xl transition">
+          + Keranjang
+        </button>
+      </div>
+    </div>
+    {% else %}
+    <p class="col-span-4 text-center text-gray-500 py-10">Belum ada produk.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ═══════════════ PETA LOKASI ═══════════════ -->
+<section class="max-w-6xl mx-auto px-4 pb-16">
+  <h2 class="font-display text-2xl font-bold text-gray-800 mb-4">Lokasi Toko</h2>
+  <div class="rounded-2xl overflow-hidden shadow border border-orange-100">
+    <!-- OpenStreetMap embed via iframe (tidak butuh API key) -->
+    <iframe
+      width="100%" height="350" frameborder="0" scrolling="no"
+      marginheight="0" marginwidth="0"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=110.797%2C-7.566%2C110.847%2C-7.536&amp;layer=mapnik&amp;marker=-7.5505%2C110.8229"
+      style="border:0" allowfullscreen loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      title="Lokasi Toko Rini, Banjarsari, Surakarta">
+    </iframe>
+  </div>
+  <p class="text-sm text-gray-500 mt-2">
+    📍 Jl. Merpati No. 24, Banjarsari, Surakarta, Jawa Tengah 57131
+    · <a href="https://www.openstreetmap.org/?mlat=-7.5505&mlon=110.8229#map=16/-7.5505/110.8229"
+         target="_blank" class="text-orange-600 hover:underline">Buka di Peta</a>
+  </p>
+</section>
+
+<!-- ═══════════════ KERANJANG BELANJA (Alpine.js) ═══════════════ -->
+<div x-data="cart()" x-init="loadCart()">
+  <!-- Tombol keranjang mengambang -->
+  <button @click="open = true"
+          class="fixed bottom-6 right-6 z-50 bg-orange-500 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:bg-orange-600 transition"
+          x-show="items.length > 0">
+    <span class="text-2xl">🛒</span>
+    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold"
+          x-text="totalQty()"></span>
+  </button>
+
+  <!-- Panel Keranjang (Slide-over) -->
+  <div x-show="open" x-transition:enter="transition ease-out duration-200"
+       class="fixed inset-0 z-50 flex justify-end" style="display:none">
+    <!-- Backdrop -->
+    <div @click="open = false" class="absolute inset-0 bg-black/40"></div>
+
+    <!-- Drawer -->
+    <div class="relative w-full max-w-sm bg-white h-full shadow-2xl flex flex-col">
+      <div class="flex items-center justify-between px-5 py-4 border-b">
+        <h2 class="font-display text-lg font-bold text-gray-800">🛒 Keranjang Saya</h2>
+        <button @click="open = false" class="text-gray-400 hover:text-gray-700">✕</button>
+      </div>
+
+      <!-- Daftar item -->
+      <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+        <template x-for="item in items" :key="item.id">
+          <div class="flex items-center gap-3 bg-orange-50 p-3 rounded-xl">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-gray-800 truncate" x-text="item.name"></p>
+              <p class="text-xs text-orange-600 font-medium"
+                 x-text="'Rp' + item.price.toLocaleString('id-ID')"></p>
+            </div>
+            <div class="flex items-center gap-1">
+              <button @click="dec(item.id)" class="w-7 h-7 bg-white border rounded-lg text-sm font-bold hover:bg-orange-100">−</button>
+              <span class="w-6 text-center text-sm font-semibold" x-text="item.qty"></span>
+              <button @click="inc(item.id)" class="w-7 h-7 bg-white border rounded-lg text-sm font-bold hover:bg-orange-100">+</button>
+            </div>
+          </div>
+        </template>
+        <p x-show="items.length === 0" class="text-center text-gray-400 text-sm pt-8">
+          Keranjang kosong
+        </p>
+      </div>
+
+      <!-- Total & Checkout -->
+      <div class="border-t px-5 py-4 space-y-3">
+        <div class="flex justify-between text-sm font-semibold">
+          <span>Total</span>
+          <span class="text-orange-600" x-text="'Rp' + totalPrice().toLocaleString('id-ID')"></span>
+        </div>
+        <button @click="showCheckout = true"
+                x-show="items.length > 0"
+                class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition">
+          Lanjut Checkout →
+        </button>
+      </div>
+
+      <!-- Form Checkout -->
+      <div x-show="showCheckout" x-transition
+           class="absolute inset-0 bg-white flex flex-col" style="display:none">
+        <div class="flex items-center gap-3 px-5 py-4 border-b">
+          <button @click="showCheckout = false" class="text-gray-400 hover:text-gray-700">←</button>
+          <h2 class="font-display text-lg font-bold text-gray-800">Detail Pesanan</h2>
+        </div>
+        <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+          <input x-model="form.name" placeholder="Nama lengkap *"
+                 class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
+          <input x-model="form.phone" placeholder="No. HP / WA *" type="tel"
+                 class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"/>
+          <textarea x-model="form.address" placeholder="Alamat pengiriman *" rows="3"
+                    class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"></textarea>
+          <textarea x-model="form.notes" placeholder="Catatan (opsional)" rows="2"
+                    class="w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"></textarea>
+          <p x-show="checkoutError" x-text="checkoutError"
+             class="text-red-600 text-xs bg-red-50 px-3 py-2 rounded-lg"></p>
+        </div>
+        <div class="border-t px-5 py-4">
+          <button @click="doCheckout()" :disabled="loading"
+                  class="w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2">
+            <span x-show="!loading">📲 Pesan via WhatsApp</span>
+            <span x-show="loading">Memproses...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// ─── Global helper dipanggil tombol "Tambah Keranjang" ───
+function addToCart(id, name, price) {
+  // Dispatch event ke Alpine component
+  window.dispatchEvent(new CustomEvent('add-to-cart', { detail: { id, name, price } }));
+  // Tampilkan keranjang
+  window.dispatchEvent(new CustomEvent('open-cart'));
+}
+
+// ─── Alpine.js Cart Component ───
+function cart() {
+  return {
+    open: false,
+    showCheckout: false,
+    items: [],
+    loading: false,
+    checkoutError: '',
+    form: { name: '', phone: '', address: '', notes: '' },
+
+    loadCart() {
+      // Dengarkan event tambah produk dari tombol di luar komponen
+      window.addEventListener('add-to-cart', (e) => this.add(e.detail));
+      window.addEventListener('open-cart',   ()  => { this.open = true; });
+    },
+
+    add({ id, name, price }) {
+      const existing = this.items.find(i => i.id === id);
+      if (existing) {
+        existing.qty++;
+      } else {
+        this.items.push({ id, name, price, qty: 1 });
+      }
+    },
+
+    inc(id) {
+      const item = this.items.find(i => i.id === id);
+      if (item) item.qty++;
+    },
+
+    dec(id) {
+      const item = this.items.find(i => i.id === id);
+      if (!item) return;
+      if (item.qty > 1) {
+        item.qty--;
+      } else {
+        this.items = this.items.filter(i => i.id !== id);
+      }
+    },
+
+    totalQty()   { return this.items.reduce((s, i) => s + i.qty, 0); },
+    totalPrice() { return this.items.reduce((s, i) => s + i.price * i.qty, 0); },
+
+    async doCheckout() {
+      this.checkoutError = '';
+      if (!this.form.name || !this.form.phone || !this.form.address) {
+        this.checkoutError = 'Nama, nomor HP, dan alamat wajib diisi.';
+        return;
+      }
+      this.loading = true;
+      try {
+        const res = await fetch('/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...this.form,
+            items: this.items.map(i => ({ id: i.id, qty: i.qty }))
+          })
+        });
+        const data = await res.json();
+        if (data.redirect) {
+          this.items = [];
+          this.open = false;
+          this.showCheckout = false;
+          window.open(data.redirect, '_blank');
+        } else {
+          this.checkoutError = data.error || 'Terjadi kesalahan.';
+        }
+      } catch (err) {
+        this.checkoutError = 'Gagal terhubung ke server.';
+      } finally {
+        this.loading = false;
+      }
+    }
+  };
+}
+</script>
+{% endblock %}
