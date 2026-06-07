@@ -1,0 +1,46 @@
+# cPanel Git deployment configuration
+# Generated to match the project's local SETUP.md (Docker/local reference).
+# See: https://docs.cpanel.net/knowledge-base/web-services/guide-to-git-deployment/
+
+deployment:
+	# Automatic deploy when the configured branch is updated.
+	type: automatic
+
+	# Branch to deploy from (change if you use a different branch)
+	branch: main
+
+	# Target directory (relative to your cPanel account home). For typical
+	# cPanel setups serving a site from public_html, use 'public_html'.
+	target: public_html
+
+	# Environment variables to set for the deployment commands.
+	environment:
+		FLASK_ENV: production
+		PYTHONUNBUFFERED: "1"
+
+	# Commands executed as part of the deployment.
+	# - `pre-deploy` prepares the runtime (virtualenv, deps).
+	# - `post-deploy` creates a Passenger WSGI entrypoint and restarts app.
+	commands:
+		pre-deploy:
+			- /usr/bin/env python3 -m venv venv
+			- . venv/bin/activate && python -m pip install --upgrade pip
+			- . venv/bin/activate && pip install -r requirements.txt
+
+		post-deploy:
+			- >-
+				cat > passenger_wsgi.py <<'PY'
+				from app import create_app
+				application = create_app()
+				PY
+			- if [ -d tmp ]; then touch tmp/restart.txt || true; fi
+			- echo "Deployed on $(date)"
+
+# Notes:
+# - Confirm `branch` and `target` match your cPanel repository settings.
+# - If cPanel provides a different Python path (for example
+#   `/opt/cpanel/ea-python39/bin/python`), replace `/usr/bin/env python3` and
+#   `python` in the `pre-deploy` commands with that interpreter path.
+# - The `passenger_wsgi.py` file is written on deploy so cPanel Passenger can
+#   detect and serve the Flask WSGI application. If you prefer Gunicorn or a
+#   different WSGI server, adjust `post-deploy` accordingly.
