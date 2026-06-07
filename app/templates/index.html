@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Toko Rini{% endblock %}
+
+{% block content %}
+<!-- ═══════════════ HERO BANNER ═══════════════ -->
+<section class="relative bg-gradient-to-br from-orange-600 via-orange-500 to-amber-400 text-white overflow-hidden">
+    <!-- Dekoratif bulatan -->
+    <div class="absolute -top-16 -right-16 w-64 h-64 bg-white/10 rounded-full"></div>
+    <div class="absolute bottom-0 left-1/3 w-40 h-40 bg-white/10 rounded-full"></div>
+
+    <div class="relative max-w-6xl mx-auto px-4 py-20 flex flex-col md:flex-row items-center gap-10">
+        <div class="flex-1">
+            <span class="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4 tracking-wider uppercase">
+                Sejak 2005 • Surakarta
+            </span>
+            <h1 class="font-display text-4xl md:text-5xl font-bold leading-tight mb-4">
+                Kebutuhan Rumah Tangga<br>Lengkap & Terjangkau
+            </h1>
+            <p class="text-orange-100 text-lg mb-8 max-w-md">
+                Toko Rini menyediakan beras, bumbu dapur, minuman, dan ribuan kebutuhan sehari-hari
+                dengan harga pasar terbaik di Banjarsari, Surakarta.
+            </p>
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ url_for('public.katalog') }}"
+                     class="bg-white text-orange-600 font-semibold px-6 py-3 rounded-full hover:bg-orange-50 transition shadow">
+                    Lihat Katalog
+                </a>
+                <a href="https://wa.me/6281234567890" target="_blank"
+                     class="flex items-center gap-2 bg-green-500 text-white font-semibold px-6 py-3 rounded-full hover:bg-green-600 transition shadow">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                        <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.847L0 24l6.335-1.509A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.795 9.795 0 01-5.031-1.388l-.36-.214-3.733.889.934-3.634-.235-.373A9.818 9.818 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/>
+                    </svg>
+                    Hubungi via WA
+                </a>
+            </div>
+        </div>
+        <div class="flex-shrink-0 text-9xl select-none hidden md:block">🛒</div>
+    </div>
+</section>
+
+<!-- ═══════════════ KEUNGGULAN ═══════════════ -->
+<section class="max-w-6xl mx-auto px-4 py-12">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+    {% for icon, label, desc in [
+        ('🏪','Lengkap','Ribuan produk tersedia'),
+        ('💰','Harga Pas','Kompetitif & transparan'),
+        ('📦','Pesanan WA','Pesan & kirim via WhatsApp'),
+        ('🕖','Buka Tiap Hari','Senin–Minggu, pagi–malam')
+    ] %}
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-orange-100 hover:shadow-md transition">
+      <div class="text-3xl mb-2">{{ icon }}</div>
+      <div class="font-semibold text-gray-800">{{ label }}</div>
+      <div class="text-xs text-gray-500 mt-1">{{ desc }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ═══════════════ PRODUK UNGGULAN ═══════════════ -->
+<section class="max-w-6xl mx-auto px-4 pb-10">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="font-display text-2xl font-bold text-gray-800">Produk Terbaru</h2>
+    <a href="{{ url_for('public.katalog') }}"
+       class="text-sm text-orange-600 font-semibold hover:underline">Lihat semua →</a>
+  </div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+    {% from 'macros/product.html' import render_product_card %}
+    {% for p in featured %}
+      {{ render_product_card(p, show_category=True) }}
+    {% else %}
+    <p class="col-span-4 text-center text-gray-500 py-10">Belum ada produk.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ═══════════════ PETA LOKASI ═══════════════ -->
+<section class="max-w-6xl mx-auto px-4 pb-16">
+  <h2 class="font-display text-2xl font-bold text-gray-800 mb-4">Lokasi Toko</h2>
+  <div class="rounded-2xl overflow-hidden shadow border border-orange-100">
+    <div class="relative" style="padding-bottom: 60%; height: 0; overflow: hidden;">
+      <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d554.7775582379711!2d110.8782564091987!3d-7.682632290198014!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a3c98af032629%3A0x2826ab3c910b7c9a!2sTOKO%20RINI%20%26%20KARINA%20CELL%20SUGIHAN!5e0!3m2!1sen!2sid!4v1780807689098!5m2!1sen!2sid" 
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+        allowfullscreen="" 
+        loading="lazy" 
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+  <p class="text-sm text-gray-500 mt-2">
+    📍 Jl. Merpati No. 24, Banjarsari, Surakarta, Jawa Tengah 57131
+    · <a href="https://www.openstreetmap.org/?mlat=-7.5505&mlon=110.8229#map=16/-7.5505/110.8229"
+         target="_blank" class="text-orange-600 hover:underline">Buka di Peta</a>
+  </p>
+</section>
+
+<!-- ═══════════════ KERANJANG BELANJA (Alpine.js) ═══════════════ -->
+{% include "partials/keranjang.html" %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/keranjang.js') }}"></script>
+{% endblock %}

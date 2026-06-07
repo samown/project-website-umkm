@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Kelola Produk{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-10">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-3xl font-semibold text-orange-700">Kelola Produk</h1>
+      <p class="text-gray-600 mt-1">Tambahkan, ubah, dan nonaktifkan produk toko.</p>
+    </div>
+    <a href="{{ url_for('admin.create_product') }}" class="inline-flex items-center justify-center rounded-full bg-orange-600 text-white px-5 py-3 text-sm font-semibold shadow-sm hover:bg-orange-700 transition">Tambah Produk</a>
+  </div>
+
+  {% if products %}
+  <div class="overflow-x-auto bg-white rounded-3xl shadow-sm border border-orange-100">
+    <table class="min-w-full text-left text-sm text-gray-600">
+      <thead class="bg-orange-50 text-gray-700">
+        <tr>
+          <th class="px-4 py-3">Produk</th>
+          <th class="px-4 py-3">Kategori</th>
+          <th class="px-4 py-3">Harga</th>
+          <th class="px-4 py-3">Stok</th>
+          <th class="px-4 py-3">Gambar</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Aksi</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-orange-100">
+        {% for product in products %}
+        <tr class="{% if not product.is_active %}opacity-50{% endif %}">
+          <td class="px-4 py-4 font-medium text-gray-900">{{ product.name }}</td>
+          <td class="px-4 py-4">{{ product.category_name or '-' }}</td>
+          <td class="px-4 py-4">Rp {{ '{:,}'.format(product.price) | replace(',', '.') }}</td>
+          <td class="px-4 py-4">{{ product.stock }}</td>
+          <td class="px-4 py-4">
+            {% if product.image %}
+            <img src="{{ url_for('static', filename='uploads/' ~ product.image) }}" alt="{{ product.name }}" class="h-16 w-16 rounded-xl object-cover border border-orange-100" />
+            {% else %}
+            <span class="text-xs text-gray-500">Tidak ada</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-4">
+            {% if product.is_active %}
+            <span class="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">● Aktif</span>
+            {% else %}
+            <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-500 text-xs font-semibold px-2.5 py-1 rounded-full">● Nonaktif</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-4 space-x-2">
+            <a href="{{ url_for('admin.edit_product', product_id=product.id) }}" class="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-3 py-2 text-sm font-medium text-orange-700 hover:bg-orange-50 transition">Ubah</a>
+            {% if product.is_active %}
+            <form action="{{ url_for('admin.delete_product') }}" method="post" class="inline-block" onsubmit="return confirm('Nonaktifkan produk ini? Produk tidak akan ditampilkan ke pelanggan, tetapi data riwayat pesanan tetap tersimpan.');">
+              <input type="hidden" name="product_id" value="{{ product.id }}" />
+              <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 transition">Nonaktifkan</button>
+            </form>
+            {% else %}
+            <form action="{{ url_for('admin.activate_product') }}" method="post" class="inline-block">
+              <input type="hidden" name="product_id" value="{{ product.id }}" />
+              <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 transition">Aktifkan</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="rounded-3xl border border-dashed border-orange-200 bg-white p-10 text-center text-sm text-gray-600">
+    Belum ada produk. Silakan tambahkan produk baru dengan tombol di atas.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

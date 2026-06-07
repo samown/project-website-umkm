@@ -1,0 +1,33 @@
+{% macro render_product_card(p, show_category=False) %}
+<div class="bg-white rounded-2xl shadow-sm border border-orange-50 overflow-hidden hover:shadow-md transition group">
+  <!-- Gambar produk (menggunakan aspect-square dari katalog.html) -->
+  <div class="aspect-square bg-orange-50 flex items-center justify-center overflow-hidden">
+    {% if p.image %}
+      <img src="{{ url_for('static', filename='uploads/' + p.image) }}"
+           alt="{{ p.name }}" class="w-full h-full object-cover group-hover:scale-105 transition"/>
+    {% else %}
+      <span class="text-5xl">🛍️</span>
+    {% endif %}
+  </div>
+
+  <!-- Info produk -->
+  <div class="p-3">
+    {% if show_category and p.category_name %}
+    <span class="text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium inline-block mb-1">
+      {{ p.category_name }}
+    </span>
+    {% endif %}
+    
+    <h3 class="text-sm font-semibold mt-1 text-gray-800 line-clamp-2">{{ p.name }}</h3>
+    <p class="text-orange-600 font-bold text-sm mt-1 mb-2">
+      Rp {{ "{:,.0f}".format(p.price).replace(",", ".") }}
+    </p>
+
+    <!-- Tombol keranjang dari index.html -->
+    <button onclick="addToCart({{ p.id }}, '{{ p.name|e }}', {{ p.price }})"
+            class="mt-2 w-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold py-2 rounded-xl transition">
+      + Keranjang
+    </button>
+  </div>
+</div>
+{% endmacro %}

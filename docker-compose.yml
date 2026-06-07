@@ -1,0 +1,40 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      # Root password: default to DB_PASSWORD if set, otherwise allow empty for local dev
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-}"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: "${DB_NAME:-toko_rini}"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      # Override default localhost from .env when running inside Docker
+      DB_HOST: db
+    volumes:
+      - ./:/app:cached
+    ports:
+      - "5000:5000"
+    command: ["python", "run.py"]
+
+volumes:
+  db_data:
+    name: toko_rini_db_data

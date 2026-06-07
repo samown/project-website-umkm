@@ -1,0 +1,15 @@
+.venv
+venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+.dockerignore
+.github
+.git
+.example
+node_modules
+*.log
+app/static/uploads
