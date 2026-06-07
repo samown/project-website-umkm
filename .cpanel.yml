@@ -1,46 +1,30 @@
-# cPanel Git deployment configuration
-# Generated to match the project's local SETUP.md (Docker/local reference).
-# See: https://docs.cpanel.net/knowledge-base/web-services/guide-to-git-deployment/
-
+---
 deployment:
-	# Automatic deploy when the configured branch is updated.
-	type: automatic
-
-	# Branch to deploy from (change if you use a different branch)
-	branch: main
-
-	# Target directory (relative to your cPanel account home). For typical
-	# cPanel setups serving a site from public_html, use 'public_html'.
-	target: public_html
-
-	# Environment variables to set for the deployment commands.
-	environment:
-		FLASK_ENV: production
-		PYTHONUNBUFFERED: "1"
-
-	# Commands executed as part of the deployment.
-	# - `pre-deploy` prepares the runtime (virtualenv, deps).
-	# - `post-deploy` creates a Passenger WSGI entrypoint and restarts app.
-	commands:
-		pre-deploy:
-			- /usr/bin/env python3 -m venv venv
-			- . venv/bin/activate && python -m pip install --upgrade pip
-			- . venv/bin/activate && pip install -r requirements.txt
-
-		post-deploy:
-			- >-
-				cat > passenger_wsgi.py <<'PY'
-				from app import create_app
-				application = create_app()
-				PY
-			- if [ -d tmp ]; then touch tmp/restart.txt || true; fi
-			- echo "Deployed on $(date)"
-
-# Notes:
-# - Confirm `branch` and `target` match your cPanel repository settings.
-# - If cPanel provides a different Python path (for example
-#   `/opt/cpanel/ea-python39/bin/python`), replace `/usr/bin/env python3` and
-#   `python` in the `pre-deploy` commands with that interpreter path.
-# - The `passenger_wsgi.py` file is written on deploy so cPanel Passenger can
-#   detect and serve the Flask WSGI application. If you prefer Gunicorn or a
-#   different WSGI server, adjust `post-deploy` accordingly.
+  tasks:
+    # 1. Define target path (Replace 'example' with your actual cPanel username)
+    - export DEPLOYPATH=/home/example/public_html
+    
+    # 2. Synchronize your repository files to the deployment directory
+    # Exclusion prevents copying the raw .git directory and local virtual environments
+    - /usr/bin/rsync -avz --exclude '.git' --exclude 'venv' ./ $DEPLOYPATH/
+    
+    # 3. Set up Python virtual environment and install dependencies
+    # (Update python3 path if cPanel uses a specific version like /opt/cpanel/ea-python39/bin/python)
+    - cd $DEPLOYPATH && /usr/bin/env python3 -m venv venv
+    - cd $DEPLOYPATH && . venv/bin/activate && python -m pip install --upgrade pip
+    - cd $DEPLOYPATH && . venv/bin/activate && pip install -r requirements.txt
+    
+    # 4. Create the Passenger WSGI entrypoint file
+    - |
+      cat > $DEPLOYPATH/passenger_wsgi.py << 'EOF'
+      import sys
+      import os
+      sys.path.insert(0, os.path.dirname(__file__))
+      from app import create_app
+      application = create_app()
+      EOF
+      
+    # 5. Tell Phusion Passenger to restart the Python application
+    - mkdir -p $DEPLOYPATH/tmp
+    - touch $DEPLOYPATH/tmp/restart.txt
+    - echo "Deployment finished successfully at $(date)"
