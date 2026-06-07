@@ -2,7 +2,7 @@
 deployment:
   tasks:
     # 1. Define the production path where this repository is deployed
-    - export DEPLOYPATH=$HOME/project-website-umkm
+    - export DEPLOYPATH=$HOME/public_html
     
     # 2. Sync the repository while preserving the server-side .env file
     - mkdir -p $DEPLOYPATH
