@@ -1,0 +1,25 @@
+# cpanel.yml - basic cPanel Git deployment hooks for this PHP project
+# Adjust branch and commands as needed for your environment
+
+branch: main
+
+include:
+  - public/
+  - src/
+  - database/
+  - README.md
+
+exclude:
+  - node_modules/
+  - vendor/
+  - .env
+
+hooks:
+  pre-deploy:
+    - echo "Starting cPanel deployment: pre-deploy steps"
+  post-deploy:
+    - echo "Post-deploy: ensuring runtime files and folders"
+    - cp .env.example .env || true
+    - mkdir -p public/images || true
+    - chmod 755 public/images || true
+    - echo "Deployment finished"
