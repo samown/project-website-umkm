@@ -20,8 +20,8 @@ function loadEnv(string $path): void {
     }
 }
 
-// .env is now at public_html/.env (one level above src/config/)
-loadEnv(dirname(__DIR__) . '/.env');
+// Muat .env dari root proyek (dua level di atas src/config/)
+loadEnv(dirname(__DIR__, 2) . '/.env');
 
 function getDB(): PDO {
     static $pdo = null;
