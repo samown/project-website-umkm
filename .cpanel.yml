@@ -1,25 +1,18 @@
-# cpanel.yml - basic cPanel Git deployment hooks for this PHP project
-# Adjust branch and commands as needed for your environment
+---
+deployment:
+  tasks:
+    # Copy all project files to the public_html directory
+    - export DEPLOYPATH=$HOME/public_html
+    - /bin/cp -r public/. $DEPLOYPATH
+    - /bin/cp -r src $DEPLOYPATH/src
+    - /bin/cp -r database $DEPLOYPATH/database
 
-branch: main
+    # Copy .env if it doesn't already exist (preserve existing credentials)
+    - "[ -f $DEPLOYPATH/.env ] || /bin/cp $HOME/project-website-umkm/.env.example $DEPLOYPATH/.env"
 
-include:
-  - public/
-  - src/
-  - database/
-  - README.md
+    # Ensure the images upload directory exists and is writable
+    - /bin/mkdir -p $DEPLOYPATH/images
+    - /bin/chmod 755 $DEPLOYPATH/images
 
-exclude:
-  - node_modules/
-  - vendor/
-  - .env
-
-hooks:
-  pre-deploy:
-    - echo "Starting cPanel deployment: pre-deploy steps"
-  post-deploy:
-    - echo "Post-deploy: ensuring runtime files and folders"
-    - cp .env.example .env || true
-    - mkdir -p public/images || true
-    - chmod 755 public/images || true
-    - echo "Deployment finished"
+    # Fix permissions on PHP files
+    - /bin/find $DEPLOYPATH -name "*.php" -exec /bin/chmod 644 {} \;
