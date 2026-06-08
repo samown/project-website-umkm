@@ -1,14 +1,17 @@
 ---
 deployment:
   tasks:
-    # Copy all project files to the public_html directory
+    # Copy public-facing files into public_html
     - export DEPLOYPATH=$HOME/public_html
     - /bin/cp -r public/. $DEPLOYPATH
-    - /bin/cp -r src $DEPLOYPATH/src
-    - /bin/cp -r database $DEPLOYPATH/database
 
-    # Copy .env if it doesn't already exist (preserve existing credentials)
-    - "[ -f $DEPLOYPATH/.env ] || /bin/cp $HOME/project-website-umkm/.env.example $DEPLOYPATH/.env"
+    # src/ and database/ must live at $HOME (one level above public_html)
+    # because index.php uses dirname(__DIR__) which resolves to $HOME
+    - /bin/cp -r src $HOME/src
+    - /bin/cp -r database $HOME/database
+
+    # Copy .env to $HOME if it doesn't already exist
+    - "[ -f $HOME/.env ] || /bin/cp .env.example $HOME/.env"
 
     # Ensure the images upload directory exists and is writable
     - /bin/mkdir -p $DEPLOYPATH/images
