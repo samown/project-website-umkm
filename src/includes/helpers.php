@@ -4,17 +4,18 @@
 declare(strict_types=1);
 
 /** Escape output untuk mencegah XSS */
-function e(mixed $value): string {
+/** @param mixed $value */
+function e($value): string {
     return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
 /** Format harga ke Rupiah */
-function rupiah(int|float $amount): string {
+function rupiah(float $amount): string {
     return 'Rp ' . number_format((float)$amount, 0, ',', '.');
 }
 
 /** Redirect ke URL */
-function redirect(string $url): never {
+function redirect(string $url): void {
     header('Location: ' . $url);
     exit;
 }
