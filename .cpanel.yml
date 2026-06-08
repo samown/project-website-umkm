@@ -6,9 +6,9 @@ deployment:
     - /bin/cp -r public/. $DEPLOYPATH
 
     # src/ and database/ live inside public_html/ alongside index.php
-    # because PHP files now use __DIR__ (= public_html/) as the base path
-    - /bin/cp -r src $DEPLOYPATH/src
-    - /bin/cp -r database $DEPLOYPATH/database
+    # Remove first so re-deployments do a clean replace (cp -r nests if dest exists)
+    - /bin/rm -rf $DEPLOYPATH/src && /bin/cp -r src $DEPLOYPATH/src
+    - /bin/rm -rf $DEPLOYPATH/database && /bin/cp -r database $DEPLOYPATH/database
 
     # Copy .env into public_html if it doesn't already exist
     - "[ -f $DEPLOYPATH/.env ] || /bin/cp .env.example $DEPLOYPATH/.env"
