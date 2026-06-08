@@ -1,4 +1,4 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/src/pages/public/contact.php';
+require_once __DIR__ . '/src/pages/public/contact.php';

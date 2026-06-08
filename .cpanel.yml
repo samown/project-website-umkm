@@ -5,13 +5,13 @@ deployment:
     - export DEPLOYPATH=$HOME/public_html
     - /bin/cp -r public/. $DEPLOYPATH
 
-    # src/ and database/ must live at $HOME (one level above public_html)
-    # because index.php uses dirname(__DIR__) which resolves to $HOME
-    - /bin/cp -r src $HOME/src
-    - /bin/cp -r database $HOME/database
+    # src/ and database/ live inside public_html/ alongside index.php
+    # because PHP files now use __DIR__ (= public_html/) as the base path
+    - /bin/cp -r src $DEPLOYPATH/src
+    - /bin/cp -r database $DEPLOYPATH/database
 
-    # Copy .env to $HOME if it doesn't already exist
-    - "[ -f $HOME/.env ] || /bin/cp .env.example $HOME/.env"
+    # Copy .env into public_html if it doesn't already exist
+    - "[ -f $DEPLOYPATH/.env ] || /bin/cp .env.example $DEPLOYPATH/.env"
 
     # Ensure the images upload directory exists and is writable
     - /bin/mkdir -p $DEPLOYPATH/images

@@ -2,8 +2,8 @@
 // public/index.php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/src/config/database.php';
-require_once dirname(__DIR__) . '/src/includes/helpers.php';
+require_once __DIR__ . '/src/config/database.php';
+require_once __DIR__ . '/src/includes/helpers.php';
 
 $db = getDB();
 
@@ -25,7 +25,7 @@ $appName   = $_ENV['APP_NAME'] ?? 'Toko Rini';
 $address   = $_ENV['STORE_ADDRESS'] ?? 'Surakarta, Jawa Tengah';
 $mapsUrl   = $_ENV['MAPS_EMBED_URL'] ?? 'https://maps.google.com/maps?q=-7.5755,110.8243&z=15&output=embed';
 $pageTitle = 'Beranda';
-require_once dirname(__DIR__) . '/src/includes/header_public.php';
+require_once __DIR__ . '/src/includes/header_public.php';
 ?>
 
 <!-- Hero Section -->
@@ -159,4 +159,4 @@ require_once dirname(__DIR__) . '/src/includes/header_public.php';
     </div>
 </section>
 
-<?php require_once dirname(__DIR__) . '/src/includes/footer_public.php'; ?>
+<?php require_once __DIR__ . '/src/includes/footer_public.php'; ?>
